@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>Sample Jasmine Tests</title>
+
+    <link rel="stylesheet" href="./jasmine/lib/jasmine-core/jasmine.css">
+    <script src="./jasmine/lib/jasmine-core/jasmine.js"></script>
+    <script src="./jasmine/lib/jasmine-core/jasmine-html.js"></script>
+
+    <!-- boot.js is required only for Jasmine 2.x -->
+    <script src="./jasmine/lib/jasmine-core/boot.js"></script>
+  </head>
+  <body>
+    <script>
+      var cat = {
+        lives: 9,
+        age: 4,
+        celebrateBirthday: function(){
+          cat.age++;
+        },
+        meow: function(){
+          return "Meow!";
+        }
+      };
+      describe("some cat properties", function(){
+        it("has nine lives", function(){
+          expect(cat.lives).toEqual(9);
+        });
+
+        it("can meow", function(){
+          spyOn(cat, "meow").and.callThrough();
+          var catsMeow = cat.meow();
+
+          expect(cat.meow).toHaveBeenCalled();
+          expect(catsMeow).toEqual("Meow!")
+        });
+
+        it("can have a birthday", function(){
+          var age = cat.age;
+          cat.celebrateBirthday();
+          expect(cat.age).toEqual(age + 1);
+        });
+      });
+    </script>
+  </body>
+</html>
