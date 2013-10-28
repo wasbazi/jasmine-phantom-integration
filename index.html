@@ -12,6 +12,9 @@
   </head>
   <body>
     <script>
+      window.api = new jasmine.JsApiReporter({});
+      jasmine.getEnv().addReporter(window.api);
+
       var cat = {
         lives: 9,
         age: 4,
@@ -22,6 +25,7 @@
           return "Meow!";
         }
       };
+
       describe("some cat properties", function(){
         it("has nine lives", function(){
           expect(cat.lives).toEqual(9);
@@ -40,6 +44,11 @@
           cat.celebrateBirthday();
           expect(cat.age).toEqual(age + 1);
         });
+
+        it("can be named", function(){
+          // cat.setName('Bob');
+          expect(cat.name).toEqual('Bob');
+        })
       });
     </script>
   </body>
