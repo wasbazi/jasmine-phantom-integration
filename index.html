@@ -9,12 +9,16 @@
 
     <!-- boot.js is required only for Jasmine 2.x -->
     <script src="./jasmine/lib/jasmine-core/boot.js"></script>
+    <script src="./ConsoleReporterLite.js"></script>
   </head>
   <body>
     <script>
-    console.log(window.complete);
       window.api = new jasmine.JsApiReporter({});
       jasmine.getEnv().addReporter(window.api);
+
+      var ConsoleReporterLite = jasmineRequire.ConsoleReporterLite();
+      window.consoleReporterLite = new ConsoleReporterLite();
+      jasmine.getEnv().addReporter(window.consoleReporterLite);
 
       var cat = {
         lives: 9,

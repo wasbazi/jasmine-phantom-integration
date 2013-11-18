@@ -1,8 +1,8 @@
-var system = require('system')
+var system = require('system'),
+    fs = require('fs');
 
-// Check the appropriate amount of arguments given
-if (system.args.length !== 2) {
-  console.log('Usage: run-jasmine.js URL');
+if (system.args.length !== 2 && system.args.length !== 3) {
+  console.log('Usage: run-jasmine.js URL [xml_file.xml]');
   phantom.exit(1);
 }
 
@@ -30,6 +30,8 @@ function waitFor(testFx, onReady, timeOutMillis) {
           if (!condition) {
             // If condition still not fulfilled (timeout but condition is 'false')
             console.log("'waitFor()' timeout");
+            console.log("Did you add tests recently? Do they all have values they are testing?");
+            console.log("For some reason at least one test may still be pending");
             phantom.exit(1);
           } else {
             // Condition fulfilled (timeout and/or condition is 'true')
@@ -55,32 +57,23 @@ page.open(system.args[1], function (status) {
   } else {
     waitFor(function () {
       return page.evaluate(function () {
-          return api.finished;
+          return consoleReporterLite.finished;
         });
     }, function () {
-      var exitCode = page.evaluate(function () {
-        console.log('');
-        console.log(document.body.querySelector('.alert > .bar').innerText);
-
-        var list = document.body.querySelectorAll('.symbol-summary .failed');
-        if (list && list.length > 0) {
-          console.log(list.length + ' test(s) FAILED:');
-          for (var i = 0; i < list.length; ++i) {
-            var el = list[i],
-                status = el.className,
-                msg = el.title;
-            console.log('');
-            console.log(status + ": " + msg);
-            console.log('');
-          }
-          return 1;
-        } else {
-          console.log(document.body.querySelector('.alert > .bar').innerText);
-          return 0;
-        }
+      var exit = page.evaluate(function () {
+        return {
+          xml: consoleReporterLite.toXML(),
+          code: consoleReporterLite.failureCount > 0 ? 1 : 0
+        };
       });
 
-      phantom.exit(exitCode);
+      if (system.args[2]) {
+        var file = fs.open(system.args[2], "w");
+        file.write(exit.xml);
+        file.close();
+      }
+
+      phantom.exit(exit.code);
     });
   }
 });
